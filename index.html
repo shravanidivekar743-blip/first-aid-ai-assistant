@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Emergency AI Assistant - 24/7 Medical Help</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<!-- Theme Toggle Button -->
+<button class="theme-toggle" onclick="toggleTheme()">🌓 Dark/Light</button>
+
+<div class="layout">
+
+    <!-- LEFT PANEL - Emergency Guide -->
+    <div class="side left-side">
+        <h3>🚨 Emergency Guide</h3>
+        <div class="emergency-tips">
+            <p>✔️ <strong>Stay calm</strong> - Panic makes it worse</p>
+            <p>📞 <strong>Call 108</strong> for ambulance</p>
+            <p>🫀 <strong>Check breathing</strong> first</p>
+            <p>🩸 <strong>Stop bleeding</strong> with pressure</p>
+            <p>🛑 <strong>Don't move</strong> if spine injury</p>
+            <p>💧 <strong>Keep hydrated</strong> in fever</p>
+        </div>
+        <hr>
+        <h3>📞 Emergency Numbers</h3>
+        <div class="emergency-numbers">
+            <p>🚑 Ambulance: <strong>108</strong></p>
+            <p>🚓 Police: <strong>100</strong></p>
+            <p>🔥 Fire: <strong>101</strong></p>
+            <p>👧 Child Helpline: <strong>1098</strong></p>
+        </div>
+    </div>
+
+    <!-- CENTER PANEL - Main Content -->
+    <div class="main">
+        <h1>🏥 Smart Emergency First-Aid Assistant</h1>
+        <p class="subtitle">🧠 AI-Powered Emergency Detection System | 24/7 Available</p>
+        
+        <!-- Input Form -->
+        <div class="input-container">
+            <form method="POST" id="emergencyForm">
+                <div class="input-group">
+                    <input type="text" name="text" id="symptomInput" 
+                           placeholder="Describe your symptoms... (e.g., 'chest pain', 'high fever', 'dog bite')" 
+                           value="{{ query if query else '' }}" required>
+                    <button type="submit">🔍 Analyze Symptoms</button>
+                    <button type="button" class="mic-btn" onclick="startVoiceInput()">🎤 Speak</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Quick Symptom Buttons -->
+        <div class="quick-symptoms">
+            <button class="quick-btn" onclick="quickSymptom('chest pain')">❤️ Chest Pain</button>
+            <button class="quick-btn" onclick="quickSymptom('high fever')">🌡️ High Fever</button>
+            <button class="quick-btn" onclick="quickSymptom('dog bite')">🐕 Dog Bite</button>
+            <button class="quick-btn" onclick="quickSymptom('accident')">🚗 Accident</button>
+            <button class="quick-btn" onclick="quickSymptom('cough')">🤧 Cough</button>
+            <button class="quick-btn" onclick="quickSymptom('stomach pain')">🤰 Stomach Pain</button>
+        </div>
+
+        <!-- ========== IMAGE UPLOAD SECTION ========== -->
+        <div class="image-section" style="margin-top: 20px; padding: 15px; background: rgba(56, 189, 248, 0.1); border-radius: 16px;">
+            <h3 style="color: #38bdf8; margin-bottom: 10px;">📸 Upload Wound/Burn Photo</h3>
+            <p style="font-size: 14px; margin-bottom: 10px;">Take a clear photo of the injury for AI analysis</p>
+            
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+                <button type="button" class="mic-btn" onclick="document.getElementById('cameraInput').click()" style="background: #8b5cf6;">
+                    📷 Take Photo
+                </button>
+                <button type="button" class="mic-btn" onclick="document.getElementById('fileInput').click()" style="background: #3b82f6;">
+                    📁 Upload from Gallery
+                </button>
+            </div>
+            
+            <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleImageUpload(this)">
+            <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="handleImageUpload(this)">
+            
+            <!-- Image Preview -->
+            <div id="imagePreview" style="margin-top: 15px; display: none;">
+                <img id="previewImg" src="" alt="Preview" style="max-width: 100%; max-height: 200px; border-radius: 12px; margin-top: 10px;">
+            </div>
+            
+            <!-- Image Analysis Result -->
+            <div id="imageResult" style="margin-top: 15px;"></div>
+        </div>
+
+        <!-- Result Display -->
+        {% if result %}
+        <div class="card" style="border-left: 5px solid 
+            {% if result.level_color == 'red' %}#ef4444
+            {% elif result.level_color == 'yellow' %}#fbbf24
+            {% elif result.level_color == 'green' %}#22c55e
+            {% else %}#94a3b8{% endif %};">
+            
+            <div class="card-header">
+                <h2>{{ result.condition }}</h2>
+                <div class="level-badge level-{{ result.level_color }}">{{ result.level }}</div>
+            </div>
+
+            {% if result.analysis %}
+            <p class="analysis">🧠 <strong>AI Analysis:</strong> {{ result.analysis }}</p>
+            {% endif %}
+
+            <div class="emergency-contact-card">
+                📞 <strong>Emergency Contact:</strong> {{ result.emergency_contact }}
+            </div>
+
+            <h4>🩺 First Aid Steps to Follow:</h4>
+            <ul class="steps-list">
+                {% for step in result.steps %}
+                    <li>{{ step }}</li>
+                {% endfor %}
+            </ul>
+
+            <div class="disclaimer">
+                ⚠️ <strong>Disclaimer:</strong> This is an AI assistant for guidance only. 
+                Always consult a doctor for proper medical advice. In emergencies, call 108 immediately.
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- RIGHT PANEL - History & Status -->
+    <div class="side right-side">
+        <h3>🧠 AI System Status</h3>
+        <div class="status-indicator">
+            <p>🟢 <strong>System:</strong> Active</p>
+            <p>⚡ <strong>Mode:</strong> Real-time Analysis</p>
+            <p>🎯 <strong>Accuracy:</strong> High</p>
+            <p>🌐 <strong>Language:</strong> English/Hindi</p>
+        </div>
+        
+        <hr>
+        
+        <h3>📋 Recent Analyses</h3>
+        <div class="history-list">
+            {% if history %}
+                {% for item in history %}
+                <div class="history-item">
+                    <p><strong>🔍 {{ item.symptoms }}</strong></p>
+                    <p>{{ item.condition }} - {{ item.level }}</p>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="no-history">No analyses yet. Describe your symptoms above!</p>
+            {% endif %}
+        </div>
+
+        <hr>
+
+        <h3>💡 Pro Tips</h3>
+        <div class="pro-tips">
+            <p>✅ Save 108 in your phone</p>
+            <p>✅ Keep first-aid kit at home</p>
+            <p>✅ Learn basic CPR online</p>
+            <p>✅ Share location with family</p>
+        </div>
+    </div>
+
+</div>
+
+<script>
+// Toggle Dark/Light Theme
+function toggleTheme() {
+    document.body.classList.toggle('light-mode');
+    localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+}
+
+// Load saved theme
+if (localStorage.getItem('theme') === 'light') {
+    document.body.classList.add('light-mode');
+}
+
+// Quick symptom buttons
+function quickSymptom(symptom) {
+    document.getElementById('symptomInput').value = symptom;
+    document.getElementById('emergencyForm').submit();
+}
+
+// Voice Input
+function startVoiceInput() {
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        
+        recognition.lang = 'en-IN'; // Indian English
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        
+        recognition.onresult = function(event) {
+            const transcript = event.results[0][0].transcript;
+            document.getElementById('symptomInput').value = transcript;
+        };
+        
+        recognition.onerror = function(event) {
+            alert('Please speak clearly into the microphone');
+        };
+        
+        recognition.start();
+        alert('Speak now... describe your symptoms');
+    } else {
+        alert('Voice input not supported in this browser. Please type your symptoms.');
+    }
+}
+
+// Enter key submit
+document.getElementById('symptomInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('emergencyForm').submit();
+    }
+});
+
+// Handle image upload
+function handleImageUpload(input) {
+    const file = input.files[0];
+    if (!file) return;
+    
+    // Show preview
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        document.getElementById('previewImg').src = e.target.result;
+        document.getElementById('imagePreview').style.display = 'block';
+        
+        // Show loading
+        document.getElementById('imageResult').innerHTML = '<div class="analysis">🔍 Analyzing image... Please wait</div>';
+        
+        // Send to server
+        fetch('/analyze_image', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                image_data: e.target.result
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const r = data.result;
+                const borderColor = r.color === 'red' ? '#ef4444' : (r.color === 'yellow' ? '#fbbf24' : (r.color === 'green' ? '#22c55e' : '#94a3b8'));
+                
+                document.getElementById('imageResult').innerHTML = `
+                    <div style="border-left: 4px solid ${borderColor}; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 12px; margin-top: 10px;">
+                        <p style="font-size: 18px; font-weight: bold; margin-bottom: 8px;">${r.severity}</p>
+                        <p style="margin-bottom: 8px;">🧠 <strong>Analysis:</strong> ${r.analysis}</p>
+                        <p style="margin-bottom: 8px;">💡 <strong>Advice:</strong> ${r.advice}</p>
+                        <p>🩹 <strong>First Aid:</strong> ${r.firstaid}</p>
+                    </div>
+                `;
+            } else {
+                document.getElementById('imageResult').innerHTML = `
+                    <div style="border-left: 4px solid #ef4444; padding: 15px; background: rgba(239,68,68,0.1); border-radius: 12px;">
+                        <p>❌ Error: ${data.error}</p>
+                        <p>📞 For emergencies, call 108 immediately.</p>
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            document.getElementById('imageResult').innerHTML = `
+                <div style="border-left: 4px solid #ef4444; padding: 15px;">
+                    <p>❌ Network error. Please try again.</p>
+                </div>
+            `;
+        });
+    };
+    reader.readAsDataURL(file);
+    
+    // Clear input
+    input.value = '';
+}
+</script>
+
+</body>
+</html>
